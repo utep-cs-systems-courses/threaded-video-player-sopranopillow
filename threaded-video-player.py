@@ -1,59 +1,41 @@
 #!/usr/bin/env python3
 
 import cv2, os, sys, time
+from threading import Thread, Semaphore
 
-if len(sys.argv) < 3:
-    print("Error executing command, usage: ./threaded-video-player.py <clipFilName>.mp4 <outputDirName>")
+class FrameReader(Thread):
+    def __init__(self, fl):
+        Thread.__init__(self)
+        pass
+    def run(self):
+        print("Frame Reader: Thread running")
 
-#globals
-outputDir = sys.argv[2]
-clipFileName = sys.argv[1]
-frameDelay = 42
+class FrameConverter(Thread):
+    def __init__(self, fl):
+        Thread.__init__(self)
+        pass
+    def run(self):
+        print("Frame Converter: Thread running")
 
-#frame count
-count = 0
+class Consumer(Thread):
+    def __init__(self, fl):
+        Thread.__init__(self)
+        pass
+    def run(self):
+        print("Consumer: Thread running")
 
-#open video clip
-vidcap = cv2.VideoCapture(clipFileName)
-numberOfFrames = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Error executing command, usage: ./threaded-video-player.py <clipFilName>.mp4 <outputDirName>")
+        sys.exit(1)
 
-#create the output directory if it doesn't exist
-if not os.path.exists(outputDir):
-    print(f"Output directory {outputDir} didn't exist, creating")
-    os.makedirs(outputDir)
-
-#read one frame
-success, frame = vidcap.read()
-
-print(f'Reading frame {count} {success}')
-
-while success and count < numberOfFrames:
-    #convert to grayscale
-    grayscaleFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) 
+    producerQueue = []
+    consumerQueue = []
+    producerLock
     
-    #write the current frame out as a jpeg image
-    cv2.imwrite(f"{outputDir}/frame_{count:04d}.bmp", grayscaleFrame)
-
-    success, frame = vidcap.read()
-    print(f'Reading frame {count}')
-    count += 1
-
-
-count = 0
-frameFileName = f'{outputDir}/grayscale_{count:04d}.bmp'
-frame = cv2.imread(frameFileName)
-
-while frame is not None:
-    print(f'Displaying frame {count}')
-
-    cv2.imshow('Video', frame)
-
-    if cv2.waitKey(frameDelay) and 0xFF == ord("q"):
-        break
-
-    count+=1
-    frameFileName = f'{outputDir}/grayscale_{count:04d}.bmp'
-
-    frame = cv2.imread(frameFileName)
-
-cv2.destroyAllWindows()
+    frameReader = FrameReader(fl)
+    frameConverter = FrameConverter(fl)
+    consumer = Consumer(fl)
+    frameReader.start()
+    frameConverter.start()
+    consumer.start()
