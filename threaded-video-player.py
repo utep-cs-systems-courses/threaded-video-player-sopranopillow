@@ -57,10 +57,10 @@ class FrameConverter(Thread): # Producer and Consumer
         consumerLock.release()
 
 class FrameDisplay(Thread): # Consumer 
-    def __init__(self, debug):
+    def __init__(self, delay, debug):
         Thread.__init__(self)
         self.debug = debug
-        self.count = 0
+        self.delay = delay
         
     def run(self):
         if debug: print("Frame Display: Thread running")
@@ -74,7 +74,7 @@ class FrameDisplay(Thread): # Consumer
                 consumerLock.release()
                 if type(img) == bool and img:
                     break
-                if cv2.waitKey(30) and 0xFF == ord("q"):
+                if cv2.waitKey(self.delay) and 0xFF == ord("q"):
                     break
                 cv2.imshow('Video', img)
         cv2.destroyAllWindows()
@@ -90,6 +90,8 @@ if __name__ == "__main__":
     else:
         debug = False
 
+    delay = 30
+        
     producerQueue = []
     consumerQueue = []
 
@@ -98,7 +100,7 @@ if __name__ == "__main__":
 
     frameReader = FrameReader(fl, debug)
     frameConverter = FrameConverter(debug)
-    frameDisplay = FrameDisplay(debug)
+    frameDisplay = FrameDisplay(delay, debug)
     frameReader.start()
     frameConverter.start()
     frameDisplay.start()
