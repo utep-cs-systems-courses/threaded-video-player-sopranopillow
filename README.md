@@ -1,5 +1,16 @@
 # Producer Consumer Lab
 
+## Use
+To use the threaded video player, these are the following commands:
+
+`$ ./threaded-video-player.py <clip>.mp4 <y : n : "">`
+
+The first parameter is the name of the video clip to use and the second parameter is if you want to show debug messages. The third parameter can be omitted and will default to not show any messages.
+
+#### Note: the amount of delay was changed to 30 and the limit per queue as well, this is mainly to be able to look at a smooth video. These settings can be changed by going in the code and changing the values in the main.
+
+---
+
 For this lab you will implement a trivial producer-consumer system using
 python threads where all coordination is managed by counting and binary
 semaphores for a system of two producers and two consumers. The producers and
